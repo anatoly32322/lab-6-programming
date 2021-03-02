@@ -187,7 +187,6 @@ public class Route extends Object implements Cloneable, Comparable{
         if (result != 0){
             return (int)(result / Math.abs(result));
         }
-
         return 0;
     }
 }

@@ -153,101 +153,116 @@ public class Commands {
      * @throws IOException
      */
     private void save() throws IOException {
-        FileOutputStream out = new FileOutputStream(path);
-        String text = "";
-        for (Route rt : data) {
-            System.out.println(rt.toCSV());
-            text = rt.toCSV() + '\n';
-            byte[] buffer = text.getBytes();
-            for (byte i : buffer) {
-                out.write(i);
+        try {
+            FileOutputStream out = new FileOutputStream(path);
+            String text = "";
+            for (Route rt : data) {
+                System.out.println(rt.toCSV());
+                text = rt.toCSV() + '\n';
+                byte[] buffer = text.getBytes();
+                for (byte i : buffer) {
+                    out.write(i);
+                }
             }
+            out.close();
+            return;
+        } catch (FileNotFoundException e){
+            System.out.println("Нету доступа к записи в файл.");
+
         }
-        out.close();
     }
 
     /**
      * Этот метод считывает и исполняет скрипт из указанного файла
      */
-    private void execute_script(String path) {
+    private void execute_script(BufferedReader br) {
+        String path = "";
         String line = "";
         String[] fields = new String[]{"name", "coordinates", "from", "to"};
         Route rt = new Route();
-        try {
-            BufferedReader br = new BufferedReader(new FileReader(path));
-            while ((line = br.readLine()) != null) {
-                line.replaceAll("\n", "");
-                line.trim();
-                String[] ln = line.split(" ");
-                switch (ln[0]){
-                    case "help":
-                        help();
-                        break;
-                    case "info":
-                        info();
-                        break;
-                    case "show":
-                        System.out.println(show());
-                        break;
-                    case "add":
-                        rt = getRoute(br);
-                        add(rt);
-                        break;
-                    case "update":
-                        rt = getRoute(br);
-                        update(Integer.parseInt(ln[1]), rt);
-                        break;
-                    case "remove_by_id":
-                        remove_by_id(Integer.parseInt(ln[1]));
-                        break;
-                    case "clear":
-                        clear();
-                        break;
-                    case "save":
-                        save();
-                        break;
-                    case "exit":
-                        exit();
-                        break;
-                    case "add_if_max":
-                        rt = getRoute(br);
-                        add_if_max(rt);
-                        break;
-                    case "add_if_min":
-                        rt = getRoute(br);
-                        add_if_min(rt);
-                        break;
-                    case "remove_lower":
-                        rt = getRoute(br);
-                        remove_lower(rt);
-                        break;
-                    case "min_by_id":
-                        min_by_id();
-                        break;
-                    case "group_counting_by_distance":
-                        group_counting_by_distance();
-                        break;
-                    case "count_by_distance":
-                        count_by_distance(Long.parseLong(ln[1]));
-                        break;
-                    case "execute_script":
-                        execute_script(ln[1]);
-                        break;
-                    default:
-                        throw new WrongInputException("Введена неверная команда. Повторите ввод.");
+        while(true) {
+            try {
+                path = br.readLine();
+                br = new BufferedReader(new FileReader(path));
+                while ((line = br.readLine()) != null) {
+                    line.replaceAll("\n", "");
+                    line.trim();
+                    String[] ln = line.split(" ");
+                    switch (ln[0]) {
+                        case "help":
+                            help();
+                            break;
+                        case "info":
+                            info();
+                            break;
+                        case "show":
+                            System.out.println(show());
+                            break;
+                        case "add":
+                            rt = getRouteScript(br);
+                            add(rt);
+                            break;
+                        case "update":
+                            rt = getRouteScript(br);
+                            update(Integer.parseInt(ln[1]), rt);
+                            break;
+                        case "remove_by_id":
+                            remove_by_id(Integer.parseInt(ln[1]));
+                            break;
+                        case "clear":
+                            clear();
+                            break;
+                        case "save":
+                            save();
+                            break;
+                        case "exit":
+                            exit();
+                            break;
+                        case "add_if_max":
+                            rt = getRouteScript(br);
+                            add_if_max(rt);
+                            break;
+                        case "add_if_min":
+                            rt = getRouteScript(br);
+                            add_if_min(rt);
+                            break;
+                        case "remove_lower":
+                            rt = getRouteScript(br);
+                            remove_lower(rt);
+                            break;
+                        case "min_by_id":
+                            min_by_id();
+                            break;
+                        case "group_counting_by_distance":
+                            group_counting_by_distance();
+                            break;
+                        case "count_by_distance":
+                            count_by_distance(Long.parseLong(ln[1]));
+                            break;
+                        case "execute_script":
+                            execute_script(br);
+                            break;
+                        default:
+                            throw new WrongInputException("Введена неверная команда.");
+                    }
                 }
+                break;
+            } catch (FileNotFoundException e) {
+                System.out.println("Файл не найден. Повторите ввод.");
+                continue;
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.exit(0);
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+                System.exit(0);
+            } catch (NoSuchFieldException e) {
+                e.printStackTrace();
+                System.exit(0);
+            } catch (WrongInputException e) {
+                e.printStackTrace();
+                System.exit(0);
             }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-        } catch (WrongInputException e){
-            e.printStackTrace();
-            System.exit(0);
         }
     }
 
@@ -264,7 +279,7 @@ public class Commands {
      */
     private void add_if_max(Route a) {
         Double dist = a.getDistance();
-        if (dist > data.getLast().getDistance()) {
+        if (a.compareTo(data.getLast()) < 0) {
             add(a);
         }
     }
@@ -275,7 +290,7 @@ public class Commands {
      */
     private void add_if_min(Route a) {
         Double dist = a.getDistance();
-        if (dist < data.getFirst().getDistance()) {
+        if (a.compareTo(data.getFirst()) > 0) {
             add(a);
         }
     }
@@ -495,10 +510,123 @@ public class Commands {
         return rt;
     }
 
+    private Route getRouteScript(BufferedReader br) {
+        String line = "";
+        String[] fields = new String[]{"name", "coordinates", "from", "to"};
+        Route rt = new Route();
+        try {
+            for (String field : fields) {
+                if (field.equals("name")) {
+                    while (true){
+                        try {
+                            line = br.readLine();
+                            if (line.length() == 0){
+                                throw new WrongInputException("Поле name должно быть заполнено.");
+                            }
+                            rt.setName(line);
+                            break;
+                        } catch (WrongInputException e){
+                            e.printStackTrace();
+                            exit();
+                        }
+                    }
+                } else if (field.equals("coordinates")) {
+                    while (true){
+                        try {
+                            line = br.readLine();
+                            String[] xyz = line.split(" ");
+                            if (xyz.length != 3){
+                                throw new WrongInputException("Неверный формат ввода.");
+                            }
+                            Long x = Long.parseLong(xyz[0]);
+                            Double y = Double.parseDouble(xyz[1]);
+                            Double z = Double.parseDouble(xyz[2]);
+                            rt.setCoordinates(new Coordinates(x, y, z));
+                            break;
+                        } catch (WrongInputException e){
+                            e.printStackTrace();
+                            exit();
+                        }
+                    }
+                } else if (field.equals("from")) {
+                    while (true) {
+                        try {
+                            line = br.readLine();
+                            line = line.toLowerCase();
+                            switch (line) {
+                                case "russia":
+                                    rt.setFrom(Location.RUSSIA);
+                                    break;
+                                case "usa":
+                                    rt.setFrom(Location.USA);
+                                    break;
+                                case "norway":
+                                    rt.setFrom(Location.NORWAY);
+                                    break;
+                                case "italy":
+                                    rt.setFrom(Location.ITALY);
+                                    break;
+                                case "france":
+                                    rt.setFrom(Location.FRANCE);
+                                    break;
+                                default:
+                                    if (line.length() != 0){
+                                        throw new WrongInputException("Неверно введены данные.");
+                                    }
+                                    rt.setFrom(Location.NULL);
+                            }
+                            break;
+                        } catch (WrongInputException e){
+                            e.printStackTrace();
+                            exit();
+                        }
+                    }
+                } else if (field.equals("to")) {
+                    while (true) {
+                        try {
+                            line = br.readLine();
+                            line = line.toLowerCase();
+                            switch (line) {
+                                case "russia":
+                                    rt.setTo(Location.RUSSIA);
+                                    break;
+                                case "usa":
+                                    rt.setTo(Location.USA);
+                                    break;
+                                case "norway":
+                                    rt.setTo(Location.NORWAY);
+                                    break;
+                                case "italy":
+                                    rt.setTo(Location.ITALY);
+                                    break;
+                                case "france":
+                                    rt.setTo(Location.FRANCE);
+                                default:
+                                    if (line.length() != 0){
+                                        throw new WrongInputException("Неверно введены данные.");
+                                    }
+                                    rt.setTo(Location.NULL);
+                            }
+                            break;
+                        } catch (WrongInputException e){
+                            e.printStackTrace();
+                            exit();
+                        }
+                    }
+                }
+            }
+            rt.setDistance(calculateDistance(rt.getCoordinates(), rt.getTo().getCoordinates()));
+            System.out.println(rt.getDistance());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return rt;
+    }
+
     /**
      * Обрабатывает файл формата CSV
      */
-    private void readCSVFile(String path) {
+    private void readCSVFile(String path) throws IOException {
         String[] fields = new String[]{"id", "name", "coordinates", "creationDate", "from", "to", "distance"};
         try {
             BufferedReader br = new BufferedReader(new FileReader(path));
@@ -579,23 +707,23 @@ public class Commands {
                 add(rt);
                 System.out.println(rt.toString());
             }
-        } catch (IOException | WrongInputException e){
+        } catch (WrongInputException e){
             e.printStackTrace();
             System.exit(0);
         }
     }
 
-        public void input() {
+    public void input(String path)  {
+        this.path = path;
+        try {
+            readCSVFile(path);
+        } catch(IOException e){
+            e.printStackTrace();
+            System.exit(0);
+        }
         String line = "";
         Route rt = new Route();
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        System.out.println("Введите путь до файла с данными");
-        try {
-            path = br.readLine();
-            readCSVFile(path);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         while(true) {
             try {
                 while (true) {
@@ -655,7 +783,8 @@ public class Commands {
                             count_by_distance(Long.parseLong(ln[1]));
                             break;
                         case "execute_script":
-                            execute_script(ln[1]);
+                            System.out.println("Введите путь до файла.");
+                            execute_script(br);
                             break;
                         default:
                             throw new WrongInputException("Введена неверная команда. Повторите ввод.");
