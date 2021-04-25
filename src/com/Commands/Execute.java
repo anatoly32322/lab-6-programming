@@ -26,7 +26,6 @@ public class Execute {
         CollectionManager collectionManager = new CollectionManager();
         while(true) {
             try {
-                System.out.println(1);
                 br = new BufferedReader(new InputStreamReader(System.in));
                 while ((line = br.readLine()) != null) {
                     line.replaceAll("\n", "");
@@ -84,7 +83,8 @@ public class Execute {
                             }
                         case "exit":
                             if (ln.length == 1){
-                                return new Request("exit", "");
+                                Exit exit = new Exit();
+                                exit.execute();
                             } else {
                                 throw new IllegalCommandException("Unknown show_<...> command");
                             }
