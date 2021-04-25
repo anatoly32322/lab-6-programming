@@ -1,4 +1,4 @@
-package com;
+package com.Exceptions;
 
 public class WrongInputException extends RuntimeException {
     public WrongInputException(){

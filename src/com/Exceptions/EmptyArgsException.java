@@ -1,4 +1,4 @@
-package com;
+package com.Exceptions;
 
 public class EmptyArgsException extends RuntimeException {
     public EmptyArgsException(){

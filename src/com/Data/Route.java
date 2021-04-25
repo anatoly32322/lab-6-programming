@@ -1,10 +1,11 @@
-package com;
+package com.Data;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
-public class Route extends Object implements Cloneable, Comparable{
+public class Route extends Object implements Cloneable, Comparable, Serializable {
     private static int count_id = 0;
     private int id; //Значение поля должно быть больше 0, Значение этого поля должно быть уникальным, Значение этого поля должно генерироваться автоматически
     private String name; //Поле не может быть null, Строка не может быть пустой

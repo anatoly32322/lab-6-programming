@@ -1,4 +1,6 @@
-package com;
+package com.Data;
+
+import com.Data.Coordinates;
 
 public enum Location {
     RUSSIA (new Coordinates((long)1, 2.0, 3.0), "Russia"),
