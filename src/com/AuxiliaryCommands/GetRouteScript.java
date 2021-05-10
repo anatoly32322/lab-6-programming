@@ -118,8 +118,7 @@ public class GetRouteScript {
                     }
                 }
             }
-            CalculateDistance calculateDistance = new CalculateDistance();
-            rt.setDistance(calculateDistance.execute(rt.getCoordinates(), rt.getTo().getCoordinates()));
+            rt.setDistance(CalculateDistance.execute(rt.getCoordinates(), rt.getTo().getCoordinates()));
             System.out.println(rt.getDistance());
         } catch (IOException e) {
             e.printStackTrace();

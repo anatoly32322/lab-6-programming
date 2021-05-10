@@ -10,7 +10,7 @@ public class Route extends Object implements Cloneable, Comparable, Serializable
     private int id; //Значение поля должно быть больше 0, Значение этого поля должно быть уникальным, Значение этого поля должно генерироваться автоматически
     private String name; //Поле не может быть null, Строка не может быть пустой
     private Coordinates coordinates; //Поле не может быть null
-    private java.time.ZonedDateTime creationDate = ZonedDateTime.of(LocalDateTime.now(), ZoneId.of("Asia/Tokyo")); //Поле не может быть null, Значение этого поля должно генерироваться автоматически
+    private ZonedDateTime creationDate = ZonedDateTime.of(LocalDateTime.now(), ZoneId.of("Asia/Tokyo")); //Поле не может быть null, Значение этого поля должно генерироваться автоматически
     private Location from; //Поле может быть null
     private Location to; //Поле может быть null
     private Double distance; //Поле не может быть null, Значение поля должно быть больше 1
@@ -23,6 +23,15 @@ public class Route extends Object implements Cloneable, Comparable, Serializable
         this.distance = distance;
         count_id++;
         this.id = count_id;
+    }
+
+    public Route(Integer id, String name, Coordinates coordinates, Location from, Location to, Double distance){
+        this.id = id;
+        this.name = name;
+        this.coordinates = coordinates;
+        this.from = from;
+        this.to = to;
+        this.distance = distance;
     }
 
     public Route(){

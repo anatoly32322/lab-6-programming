@@ -139,9 +139,11 @@ public class Execute {
             } catch (FileNotFoundException e) {
                 System.out.println("Файл не найден. Повторите ввод.");
                 continue;
-            } catch (IOException | WrongInputException e) {
+            } catch (IOException e) {
                 e.printStackTrace();
                 System.exit(0);
+            } catch (WrongInputException e){
+                System.err.println("Введена неверная команда");
             }
         }
         return new Request("exit", "");

@@ -4,11 +4,17 @@ import com.Data.Coordinates;
 import com.Data.Location;
 import com.Data.Route;
 import com.Exceptions.WrongInputException;
+import com.AuxiliaryCommands.CalculateDistance;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 
 public class GetRoute {
+    private Coordinates coordinates;
+    private Location from;
+    private Location to;
+    private String name;
+    private BufferedReader br;
     public GetRoute(){}
 
     public Route execute(BufferedReader br){
@@ -128,4 +134,5 @@ public class GetRoute {
         }
         return rt;
     }
+
 }

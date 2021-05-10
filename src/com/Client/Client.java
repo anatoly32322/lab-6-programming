@@ -1,5 +1,6 @@
 package com.Client;
 
+import com.AuthManager;
 import com.Data.ExecuteRequest;
 import com.Data.Report;
 import com.Data.Request;
@@ -24,6 +25,7 @@ public class Client {
     private SocketAddress address;
     private ByteBuffer byteBuffer = ByteBuffer.allocate(16384);
     private BufferedReader br;
+    private AuthManager authManager = new AuthManager();
 
     public Client(String host, int port, BufferedReader br) {
         this.host = host;
@@ -42,9 +44,11 @@ public class Client {
             selector = Selector.open();
             channel.register(selector, SelectionKey.OP_WRITE);
 
-            //System.out.println(1);
+
+            sendRequest(authManager.authorization(br));
+
             while (true) {
-                request = null; // new initialization
+                request = ExecuteRequest.doingRequest(); // new initialization
                 try {
                     sendRequest(request);
                 } catch (ExitException e) {
@@ -54,7 +58,6 @@ public class Client {
 
                 answer = null; // new initialization
                 try {
-                    System.out.println(1);
                     answer = getAnswer();
                     try {
                         System.out.println("Received from server: " + answer.getReportBody());
@@ -79,15 +82,6 @@ public class Client {
 
     private void sendRequest(Request request)
             throws IOException {
-
-        try {
-            request = ExecuteRequest.doingRequest();
-        } catch (ExitException e) {
-            throw e;
-        } catch (RuntimeException e) {
-            System.out.println(e.getMessage());
-            sendRequest(request);
-        }
 
         byteBuffer = ByteBuffer.wrap(serialize(request));
 
