@@ -3,8 +3,10 @@ package com.Client;
 import com.AuthManager;
 import com.Data.ExecuteRequest;
 import com.Data.Report;
+import com.Data.ReportState;
 import com.Data.Request;
 import com.Exceptions.ExitException;
+import com.Exceptions.InvalidInputException;
 
 import java.io.*;
 import java.net.InetSocketAddress;
@@ -44,8 +46,19 @@ public class Client {
             selector = Selector.open();
             channel.register(selector, SelectionKey.OP_WRITE);
 
-
-            sendRequest(authManager.authorization(br));
+            while(true) {
+                try {
+                    sendRequest(authManager.authorization(br));
+                    answer = getAnswer();
+                    if (answer.getAnswerState().equals(ReportState.OK)) {
+                        break;
+                    } else {
+                        throw new InvalidInputException();
+                    }
+                } catch(InvalidInputException e){
+                    System.err.println("Неверные данные для входа. Повторите попытку.");
+                }
+            }
 
             while (true) {
                 request = ExecuteRequest.doingRequest(); // new initialization
